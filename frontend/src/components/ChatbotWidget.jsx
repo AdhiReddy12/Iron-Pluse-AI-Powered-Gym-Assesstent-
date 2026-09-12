@@ -313,7 +313,7 @@ export default function ChatbotWidget() {
                     aria-label="Open Chatbot"
                 >
                     <div className="icon-wrapper">
-                        <Bot size={26} />
+                        <Bot size={20} />
                     </div>
                     <span className="trigger-pulse" />
                     <span className="unread-badge">1</span>
