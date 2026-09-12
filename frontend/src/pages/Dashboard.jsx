@@ -8,7 +8,7 @@ import {
     BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
     ResponsiveContainer,
 } from 'recharts';
-import { Fire as Flame, Pulse as Activity, ForkKnife as Utensils, Barbell as Dumbbell, Sparkle as Sparkles, TrendUp as TrendingUp, TrendDown as TrendingDown, Target as Target, CaretRight as ChevronRight, Trophy as Award, Brain as BrainCircuit, Scales as Scale, Heart as Heart } from '@phosphor-icons/react';
+import { Fire, Fire as Flame, Pulse as Activity, ForkKnife as Utensils, Barbell as Dumbbell, Sparkle as Sparkles, TrendUp as TrendingUp, TrendDown as TrendingDown, Target as Target, CaretRight as ChevronRight, Trophy as Award, Brain as BrainCircuit, Scales as Scale, Heart as Heart } from '@phosphor-icons/react';
 import './Dashboard.css';
 
 /* ── Utilities ─────────────────────────────────────────────── */
@@ -309,7 +309,7 @@ export default function Dashboard() {
             <div className="dash-header">
                 <div className="dash-header-left">
                     <h1>
-                        {getGreeting()}, {name} <span className="greeting-wave">👋</span>
+                        {getGreeting()}, {name}
                     </h1>
                     <p>Here's how you're doing today.</p>
                 </div>
@@ -468,12 +468,12 @@ export default function Dashboard() {
                                 <BarChart data={barData} barGap={6} barCategoryGap="20%" margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#00f0ff" stopOpacity={1}/>
-                                            <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.8}/>
+                                            <stop offset="0%" stopColor="#00f0ff" stopOpacity={1} />
+                                            <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.8} />
                                         </linearGradient>
                                         <linearGradient id="colorEaten" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#f59e0b" stopOpacity={1}/>
-                                            <stop offset="100%" stopColor="#d97706" stopOpacity={0.8}/>
+                                            <stop offset="0%" stopColor="#f59e0b" stopOpacity={1} />
+                                            <stop offset="100%" stopColor="#d97706" stopOpacity={0.8} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -545,8 +545,8 @@ export default function Dashboard() {
                                 <div key={idx} className="ai-insight-item">
                                     <div className={`ai-insight-icon ${insight.type}`}>
                                         {insight.type === 'success' ? <TrendingUp size={14} /> :
-                                         insight.type === 'warning' ? <TrendingDown size={14} /> :
-                                         <Activity size={14} />}
+                                            insight.type === 'warning' ? <TrendingDown size={14} /> :
+                                                <Activity size={14} />}
                                     </div>
                                     <div className="ai-insight-text">{insight.text}</div>
                                 </div>
@@ -672,7 +672,9 @@ export default function Dashboard() {
                 {/* Weekly Fitness Streak */}
                 <div className="dash-card">
                     <div className="streak-content">
-                        <div className="streak-emoji">🔥</div>
+                        <div className="streak-icon">
+                            <Fire size={36} weight="fill" className="streak-fire-icon" />
+                        </div>
                         <div className="streak-number">{currentStreak}</div>
                         <div className="streak-label">{currentStreak === 1 ? 'day' : 'days'} current streak</div>
                         {bestStreak > 0 && (
