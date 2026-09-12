@@ -5,7 +5,7 @@ import { predictCalories, saveCaloriePrediction, fetchCaloriePredictions, checkM
 import './CaloriePredictor.css';
 import PageReveal from '../components/PageReveal';
 import AccessibleButton from '../components/AccessibleButton';
-import { Dumbbell, Timer, Ruler, Activity, Scale, Cake, Heart, BarChart2, Calendar, Save, RotateCcw, Sparkles, Zap, Bike, Waves, Footprints, Flame, Repeat, User, ClipboardList, AlertCircle, Target, Utensils } from 'lucide-react';
+import { Barbell as Dumbbell, Timer as Timer, Ruler as Ruler, Pulse as Activity, Scales as Scale, Cake as Cake, Heart as Heart, ChartBar as BarChart2, Calendar as Calendar, FloppyDisk as Save, ArrowCounterClockwise as RotateCcw, Sparkle as Sparkles, Lightning as Zap, Bicycle as Bike, Waves as Waves, Footprints as Footprints, Fire as Flame, Repeat as Repeat, User as User, ClipboardText as ClipboardList, WarningCircle as AlertCircle, Target as Target, ForkKnife as Utensils } from '@phosphor-icons/react';
 
 const DEFAULT_EXERCISE_TYPES = [
     { value: 'Running', emoji: <Activity size={20} />, label: 'Running' },
@@ -107,7 +107,7 @@ export default function CaloriePredictor() {
     const isWeightValid = form.weight_kg !== '' && !invalidWeight;
     const isHeightValid = form.height_cm !== '' && !invalidHeight;
     const isDurationValid = form.duration_min !== '' && Number(form.duration_min) > 0;
-    const isHeartRateValid = form.heart_rate !== '' && Number(form.heart_rate) >= 40 && Number(form.heart_rate) <= 220;
+    const isHeartRateValid = form.heart_rate !== '' && Number(form.heart_rate) >= 30 && Number(form.heart_rate) <= 220;
     const isExerciseValid = !!form.exercise_type;
 
     const canSubmit = isAgeValid && isWeightValid && isHeightValid &&
@@ -151,7 +151,7 @@ export default function CaloriePredictor() {
         if (!isWeightValid) invalidFields.push({ name: 'weight_kg', ref: weightRef, msg: invalidWeight ? 'Weight must be 20–300 kg' : 'Weight is required' });
         if (!isHeightValid) invalidFields.push({ name: 'height_cm', ref: heightRef, msg: invalidHeight ? 'Height must be 50–250 cm' : 'Height is required' });
         if (!isDurationValid) invalidFields.push({ name: 'duration_min', ref: durationRef, msg: 'Duration is required' });
-        if (!isHeartRateValid) invalidFields.push({ name: 'heart_rate', ref: heartRateRef, msg: 'Heart rate must be between 40 and 220 BPM' });
+        if (!isHeartRateValid) invalidFields.push({ name: 'heart_rate', ref: heartRateRef, msg: 'Heart rate must be between 30 and 220 BPM' });
         if (!isExerciseValid) invalidFields.push({ name: 'exercise_type', ref: exerciseRef, msg: 'Exercise type is required' });
 
         if (invalidFields.length > 0) {

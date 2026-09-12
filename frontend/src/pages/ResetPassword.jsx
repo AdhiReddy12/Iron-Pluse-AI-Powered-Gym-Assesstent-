@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Silk from '../components/Silk';
 import AccessibleButton from '../components/AccessibleButton';
-import { Lock, Check, X, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Lock as Lock, Check as Check, X as X, WarningCircle as AlertCircle, Eye as Eye, EyeClosed as EyeOff } from '@phosphor-icons/react';
 
 const API_BASE = 'https://iron-pulse-backend.onrender.com/api';
 

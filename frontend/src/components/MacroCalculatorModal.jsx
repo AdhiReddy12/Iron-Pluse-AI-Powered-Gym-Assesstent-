@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Flame, X, Check, Calculator, Sparkles, User, Activity, Target, Cake, Ruler, Scale, Sunrise, Zap } from 'lucide-react';
+import { Fire as Flame, X as X, Check as Check, Calculator as Calculator, Sparkle as Sparkles, User as User, Pulse as Activity, Target as Target, Cake as Cake, Ruler as Ruler, Scales as Scale, SunHorizon as Sunrise, Lightning as Zap } from '@phosphor-icons/react';
 import { useMacros, ACTIVITY_MULTIPLIERS, FITNESS_GOALS, calculateMacroTargets } from '../context/MacroContext';
 import '../pages/FoodPlan.css';
 
@@ -301,12 +301,16 @@ export default function MacroCalculatorModal({ forceOpen = false, onClose }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Your Age</label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d{0,3}$/.test(val)) {
+                    setFormData({ ...formData, age: val });
+                  }
+                }}
                 placeholder="Enter your age"
-                min="10"
-                max="120"
                 style={{
                   padding: '1rem',
                   borderRadius: '8px',
@@ -329,12 +333,16 @@ export default function MacroCalculatorModal({ forceOpen = false, onClose }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Height (cm)</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={formData.height}
-                  onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '' || /^\d{0,3}$/.test(val)) {
+                      setFormData({ ...formData, height: val });
+                    }
+                  }}
                   placeholder="Enter your height"
-                  min="50"
-                  max="300"
                   style={{
                     padding: '1rem',
                     borderRadius: '8px',
@@ -349,12 +357,16 @@ export default function MacroCalculatorModal({ forceOpen = false, onClose }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Weight (kg)</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '' || /^\d{0,3}(\.\d{0,1})?$/.test(val)) {
+                      setFormData({ ...formData, weight: val });
+                    }
+                  }}
                   placeholder="Enter your weight"
-                  min="20"
-                  max="300"
                   style={{
                     padding: '1rem',
                     borderRadius: '8px',

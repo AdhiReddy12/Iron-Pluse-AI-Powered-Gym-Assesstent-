@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { loginUser, resendVerificationEmail } from '../api/auth';
 import Silk from '../components/Silk';
 import AccessibleButton from '../components/AccessibleButton';
-import { Flame, Mail, Lock, AlertCircle, Check, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Fire as Flame, Envelope as Mail, Lock as Lock, WarningCircle as AlertCircle, Check as Check, ArrowsClockwise as RefreshCw, Eye as Eye, EyeClosed as EyeOff } from '@phosphor-icons/react';
 
 /* ── Inline Google SVG logo ───────────────────────────────── */
 function GoogleLogo() {

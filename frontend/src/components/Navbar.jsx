@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard, Dumbbell, Utensils, BrainCircuit, Scale,
-  User, Flame, LogOut, ChevronDown, Keyboard, Activity,
-} from 'lucide-react';
+import { SquaresFour as LayoutDashboard, Barbell as Dumbbell, ForkKnife as Utensils, Brain as BrainCircuit, Scales as Scale, User as User, Fire as Flame, SignOut as LogOut, CaretDown as ChevronDown, Keyboard as Keyboard, Pulse as Activity } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import { usePlan } from '../context/PlanContext';
 import { useMacros } from '../context/MacroContext';

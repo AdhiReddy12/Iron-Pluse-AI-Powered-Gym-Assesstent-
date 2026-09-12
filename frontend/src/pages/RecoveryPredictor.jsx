@@ -3,7 +3,7 @@ import './RecoveryPredictor.css';
 import PageReveal from '../components/PageReveal';
 import AccessibleButton from '../components/AccessibleButton';
 import { predictRecoveryScore } from '../api/auth';
-import { Moon, HeartPulse, Flame, Zap, Droplets, Activity, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Moon as Moon, Heartbeat as HeartPulse, Fire as Flame, Lightning as Zap, Drop as Droplets, Pulse as Activity, Warning as AlertTriangle, ShieldCheck as ShieldCheck } from '@phosphor-icons/react';
 
 const RECOVERY_TIERS = [
     { min: 0, max: 45, label: 'Low Recovery / High Fatigue', color: '#f43f5e', icon: AlertTriangle, statusClass: 'tier-low', advice: 'Prioritize deep sleep, hydration, and light stretching. Avoid heavy compound lifts today.' },

@@ -5,7 +5,7 @@ import { useMacros } from '../context/MacroContext';
 import { searchFoods, logMeal, deleteMeal, fetchMeals, fetchMealSummary, getLocalDateString } from '../api/auth';
 import './FoodPlan.css';
 import AccessibleButton from '../components/AccessibleButton';
-import { Search, Ruler, User, Scale, Cake, Flame, Target, Utensils, Leaf, Zap, Sunrise, Sun, Moon, Sparkles, CheckCircle2, AlertCircle, X, Trash2 } from 'lucide-react';
+import { MagnifyingGlass as Search, Ruler as Ruler, User as User, Scales as Scale, Cake as Cake, Fire as Flame, Target as Target, ForkKnife as Utensils, Leaf as Leaf, Lightning as Zap, SunHorizon as Sunrise, Sun as Sun, Moon as Moon, Sparkle as Sparkles, CheckCircle as CheckCircle2, WarningCircle as AlertCircle, X as X, Trash as Trash2 } from '@phosphor-icons/react';
 
 const FOOD_WIZARD_STEPS = [
     { key: 'age', label: 'How old are you?', icon: <Cake size={20} /> },
@@ -371,21 +371,18 @@ export default function FoodPlan() {
                     <div className={`input-field fw-number-input ${isInvalid ? 'invalid' : ''}`}>
                         <span className="icon">{step.icon}</span>
                         <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             placeholder={placeholder}
                             value={val}
                             onChange={(e) => {
                                 const maxLen = step.key === 'age' ? 2 : 3;
-                                const inputVal = e.target.value.slice(0, maxLen);
-                                setWizardData({ ...wizardData, [step.key]: inputVal });
+                                const v = e.target.value;
+                                const rx = new RegExp(`^\\d{0,${maxLen}}$`);
+                                if (v === '' || rx.test(v)) {
+                                    setWizardData({ ...wizardData, [step.key]: v });
+                                }
                             }}
-                            onKeyDown={(e) => {
-                                if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
-                                const maxLen = step.key === 'age' ? 2 : 3;
-                                if (e.target.value.length >= maxLen && /^[0-9]$/.test(e.key)) e.preventDefault();
-                            }}
-                            min={minVal}
-                            max={maxVal}
                             autoFocus
                         />
                         <span className="fw-unit">{units}</span>
