@@ -60,7 +60,7 @@ export default function MacroCalculatorModal({ forceOpen = false, onClose }) {
 
   const isCurrentStepValid = () => {
     if (step === 0) return Boolean(formData.gender);
-    if (step === 1) return Boolean(formData.age && Number(formData.age) >= 10 && Number(formData.age) <= 120);
+    if (step === 1) return Boolean(formData.age && Number(formData.age) >= 10 && Number(formData.age) <= 99);
     if (step === 2) return Boolean(formData.height && Number(formData.height) >= 50 && formData.weight && Number(formData.weight) >= 20);
     if (step === 3) return Boolean(formData.activity);
     if (step === 4) return Boolean(formData.goal);
@@ -306,7 +306,7 @@ export default function MacroCalculatorModal({ forceOpen = false, onClose }) {
                 value={formData.age}
                 onChange={(e) => {
                   const val = e.target.value;
-                  if (val === '' || /^\d{0,3}$/.test(val)) {
+                  if (val === '' || /^\d{0,2}$/.test(val)) {
                     setFormData({ ...formData, age: val });
                   }
                 }}
@@ -321,8 +321,8 @@ export default function MacroCalculatorModal({ forceOpen = false, onClose }) {
                   outline: 'none',
                 }}
               />
-              {formData.age && (Number(formData.age) < 10 || Number(formData.age) > 120) && (
-                <span style={{ color: '#ff6b6b', fontSize: '0.85rem' }}>Please enter a valid age (10-120)</span>
+              {formData.age && (Number(formData.age) < 10 || Number(formData.age) > 99) && (
+                <span style={{ color: '#ff6b6b', fontSize: '0.85rem' }}>Please enter a valid age (10-99)</span>
               )}
             </div>
           )}

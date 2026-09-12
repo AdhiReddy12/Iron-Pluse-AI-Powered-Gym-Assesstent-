@@ -73,6 +73,18 @@ export default function Login() {
 
   const [submitted, setSubmitted] = useState(false);
   const [hadError, setHadError] = useState({});
+    const [touched, setTouched] = useState({});
+    const [focused, setFocused] = useState({});
+
+    const handleBlur = (field) => () => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setFocused((prev) => ({ ...prev, [field]: false }));
+    };
+
+    const handleFocus = (field) => () => {
+        setFocused((prev) => ({ ...prev, [field]: true }));
+    };
+
 
   // Silent warmup of ML services on login page mount
   useEffect(() => {
@@ -102,6 +114,14 @@ export default function Login() {
     } else if (field === 'password') {
       isValid = password.length >= 6;
       isInvalid = (submitted || password.length > 0) && !isValid;
+    }
+
+        if (focused && focused[field] && !submitted) {
+        isInvalid = false;
+        isValid = false;
+    } else if (!submitted && touched && !touched[field]) {
+        isInvalid = false;
+        isValid = false;
     }
 
     if (isInvalid) return 'invalid';
@@ -346,7 +366,10 @@ export default function Login() {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setSubmitted(false);
+              }}
               onFocus={() => setEmailFocused(true)}
               onBlur={() => setEmailFocused(false)}
               style={inputStyle('email')}
@@ -367,7 +390,10 @@ export default function Login() {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setSubmitted(false);
+              }}
               onFocus={() => setPasswordFocused(true)}
               onBlur={() => setPasswordFocused(false)}
               style={{ ...inputStyle('password'), paddingRight: '44px' }}
