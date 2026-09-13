@@ -161,7 +161,8 @@ export default function Login() {
     setLoading(true);
     setLiveAnnouncement('Submitting credentials, please wait...');
     try {
-      const data = await loginUser({ email, password });
+      const normalizedEmail = email.trim().toLowerCase();
+      const data = await loginUser({ email: normalizedEmail, password });
       login(data.user);
       setLiveAnnouncement('Login successful. Redirecting to dashboard.');
       navigate('/dashboard');
@@ -182,7 +183,8 @@ export default function Login() {
     setResendSuccess('');
     setError('');
     try {
-      const data = await resendVerificationEmail(email);
+      const normalizedEmail = email.trim().toLowerCase();
+      const data = await resendVerificationEmail(normalizedEmail);
       setResendSuccess(data.message || 'Verification email sent! Check your inbox.');
       setLiveAnnouncement('Verification email sent successfully.');
     } catch (err) {
@@ -236,14 +238,15 @@ export default function Login() {
     return {
       width: '100%',
       padding: '13px 16px 13px 44px',
-      background: 'var(--bg-input)',
+      background: '#0c1020',
       border: `1px solid ${borderColor}`,
       borderRadius: 'var(--radius-sm)',
       color: 'var(--text-primary)',
       fontFamily: 'var(--font-body)',
       fontSize: '0.9375rem',
       outline: 'none',
-      transition: 'all 0.25s ease',
+      caretColor: '#00f0ff',
+      transition: 'border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease',
       boxShadow: shadow,
     };
   };

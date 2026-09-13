@@ -29,10 +29,11 @@ function checkAuthError(res) {
 // ---- Auth ----
 
 export async function signupUser({ username, email, password, age }) {
+    const normalizedEmail = (email || '').trim().toLowerCase();
     const res = await apiFetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, age: parseInt(age) }),
+        body: JSON.stringify({ username, email: normalizedEmail, password, age: parseInt(age) }),
     });
     let data;
     try {
@@ -53,12 +54,13 @@ export async function signupUser({ username, email, password, age }) {
 }
 
 export async function loginUser({ email, password }) {
+    const normalizedEmail = (email || '').trim().toLowerCase();
     const res = await apiFetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: normalizedEmail, password }),
     });
     let data;
     try {
@@ -113,12 +115,13 @@ export async function changePassword(credentials, { currentPassword, newPassword
 }
 
 export async function resendVerificationEmail(email) {
+    const normalizedEmail = (email || '').trim().toLowerCase();
     const res = await apiFetch(`${API_BASE}/resend-verification`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: normalizedEmail }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to resend email');

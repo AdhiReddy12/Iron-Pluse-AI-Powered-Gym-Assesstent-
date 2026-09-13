@@ -34,7 +34,7 @@ const pageVariants = {
 
 export default function Layout() {
     const location = useLocation();
-    const { hasConfiguredMacros, macrosLoading } = useMacros();
+    const { hasConfiguredMacros, macrosLoading, shouldShowOnboardingWizard } = useMacros();
     const { isModalOpen, closeModal, toggleModal } = useKeyboardShortcuts();
 
     // 1. Loading state while checking macro profile from backend
@@ -78,7 +78,7 @@ export default function Layout() {
 
     // 2. If macros are not set, trigger macro calculator wizard before anything else.
     // Do NOT show navbar, outlet, chatbot, or any other pages without macros set.
-    if (!hasConfiguredMacros) {
+    if (shouldShowOnboardingWizard) {
         return (
             <div className="layout-wrapper" style={{ minHeight: '100vh', position: 'relative' }}>
                 <Silk color="#7B7481" speed={0.4} scale={3.0} />

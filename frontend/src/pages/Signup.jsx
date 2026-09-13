@@ -204,14 +204,15 @@ export default function Signup() {
     setLoading(true);
     setLiveAnnouncement('Submitting signup form...');
     try {
+      const normalizedEmail = form.email.trim().toLowerCase();
       await signupUser({
-        username: form.username,
-        email: form.email,
+        username: form.username.trim(),
+        email: normalizedEmail,
         password: form.password,
         age: form.age,
       });
-      localStorage.setItem(`iron_newly_registered_${form.email.toLowerCase()}`, 'true');
-      setRegisteredEmail(form.email);
+      localStorage.setItem(`iron_newly_registered_${normalizedEmail}`, 'true');
+      setRegisteredEmail(normalizedEmail);
       setShowVerificationModal(true);
     } catch (err) {
       setError(err.message);
@@ -258,14 +259,15 @@ export default function Signup() {
     return {
       width: '100%',
       padding: '13px 16px 13px 44px',
-      background: 'var(--bg-input)',
+      background: '#0c1020',
       border: `1px solid ${borderColor}`,
       borderRadius: 'var(--radius-sm)',
       color: 'var(--text-primary)',
       fontFamily: 'var(--font-body)',
       fontSize: '0.9375rem',
       outline: 'none',
-      transition: 'all 0.25s ease',
+      caretColor: '#00f0ff',
+      transition: 'border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease',
       boxShadow: shadow,
     };
   };
