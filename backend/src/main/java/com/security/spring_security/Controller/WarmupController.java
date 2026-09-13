@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping({"/api", ""})
 public class WarmupController {
 
     private static final Logger log = LoggerFactory.getLogger(WarmupController.class);
@@ -24,8 +24,18 @@ public class WarmupController {
     @Autowired
     private WarmupService warmupService;
 
+    @GetMapping("/warmup")
+    public ResponseEntity<String> warmup() {
+        try {
+            warmupService.warmupAllServices();
+        } catch (Exception e) {
+            log.warn("Warmup trigger on GET encountered: {}", e.getMessage());
+        }
+        return ResponseEntity.ok("Hello! Iron Pulse backend is warming up.");
+    }
+
     @PostMapping("/warmup")
-    public ResponseEntity<Void> warmup() {
+    public ResponseEntity<Void> warmupPost() {
         Instant now = Instant.now();
         Instant tenMinutesAgo = now.minus(TIME_WINDOW_MINUTES, java.time.temporal.ChronoUnit.MINUTES);
 
