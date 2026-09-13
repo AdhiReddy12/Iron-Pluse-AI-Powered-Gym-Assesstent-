@@ -59,6 +59,10 @@ public class UserController {
 
         Map<String, Object> response = new HashMap<>();
 
+        if (user.getEmail() != null) {
+            user.setEmail(user.getEmail().trim().toLowerCase());
+        }
+
         try {
             userService.register(user);
 
@@ -117,7 +121,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> login(
             @RequestBody Map<String, String> loginRequest) {
 
-        String email = loginRequest.get("email");
+        String email = loginRequest.get("email") != null ? loginRequest.get("email").trim().toLowerCase() : null;
         String password = loginRequest.get("password");
 
         Map<String, Object> response = new HashMap<>();
@@ -526,7 +530,7 @@ public class UserController {
             @RequestBody Map<String, String> body) {
 
         Map<String, Object> response = new HashMap<>();
-        String email = body.get("email");
+        String email = body.get("email") != null ? body.get("email").trim().toLowerCase() : null;
 
         if (email == null || email.isBlank()) {
             response.put("success", false);
@@ -607,7 +611,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> resendVerification(
             @RequestBody Map<String, String> body) {
 
-        String email = body.get("email");
+        String email = body.get("email") != null ? body.get("email").trim().toLowerCase() : null;
 
         Map<String, Object> response = new HashMap<>();
 
