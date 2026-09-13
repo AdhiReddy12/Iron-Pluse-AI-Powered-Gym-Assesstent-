@@ -69,4 +69,13 @@ public class User {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean hasConfiguredMacros = false;
 
+    // Legal & consent compliance tracking (GDPR Art. 7 audit trail)
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean termsAccepted = true;
+
+    private java.time.LocalDateTime termsAcceptedAt;
+
+    @Column(length = 32)
+    private String termsVersion = "2026-10-14";
+
 }

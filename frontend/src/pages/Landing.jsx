@@ -97,6 +97,23 @@ export default function Landing() {
                         <p>Stay consistent with daily workout streaks and progress tracking.</p>
                     </div>
                 </section>
+
+                <footer className="landing-footer">
+                    <div className="landing-footer-inner">
+                        <div className="landing-footer-brand">
+                            IRON <span>PULSE</span>
+                        </div>
+                        <div className="landing-footer-links">
+                            <Link to="/terms">Terms of Service</Link>
+                            <Link to="/privacy">Privacy Policy</Link>
+                            <Link to="/login">Sign In</Link>
+                            <Link to="/signup">Get Started</Link>
+                        </div>
+                        <div className="landing-footer-copy">
+                            © {new Date().getFullYear()} Iron Pulse. All rights reserved.
+                        </div>
+                    </div>
+                </footer>
             </PageReveal>
         </>
     );

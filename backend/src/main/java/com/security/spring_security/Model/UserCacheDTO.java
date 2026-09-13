@@ -25,6 +25,9 @@ public class UserCacheDTO implements Serializable {
     private Integer targetFats;
     private Integer targetCarbs;
     private boolean hasConfiguredMacros;
+    private boolean termsAccepted;
+    private java.time.LocalDateTime termsAcceptedAt;
+    private String termsVersion;
 
     public UserCacheDTO() {
     }
@@ -44,6 +47,9 @@ public class UserCacheDTO implements Serializable {
         this.targetFats = user.getTargetFats();
         this.targetCarbs = user.getTargetCarbs();
         this.hasConfiguredMacros = user.isHasConfiguredMacros();
+        this.termsAccepted = user.isTermsAccepted();
+        this.termsAcceptedAt = user.getTermsAcceptedAt();
+        this.termsVersion = user.getTermsVersion();
     }
 
     public int getId() {
@@ -156,5 +162,29 @@ public class UserCacheDTO implements Serializable {
 
     public void setHasConfiguredMacros(boolean hasConfiguredMacros) {
         this.hasConfiguredMacros = hasConfiguredMacros;
+    }
+
+    public boolean isTermsAccepted() {
+        return termsAccepted;
+    }
+
+    public void setTermsAccepted(boolean termsAccepted) {
+        this.termsAccepted = termsAccepted;
+    }
+
+    public java.time.LocalDateTime getTermsAcceptedAt() {
+        return termsAcceptedAt;
+    }
+
+    public void setTermsAcceptedAt(java.time.LocalDateTime termsAcceptedAt) {
+        this.termsAcceptedAt = termsAcceptedAt;
+    }
+
+    public String getTermsVersion() {
+        return termsVersion;
+    }
+
+    public void setTermsVersion(String termsVersion) {
+        this.termsVersion = termsVersion;
     }
 }

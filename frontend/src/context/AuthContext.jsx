@@ -70,6 +70,12 @@ export function AuthProvider({ children }) {
         setUser(userData);
         try {
             if (userData) {
+                // Clean any other user's macro cache to prevent cross-account contamination
+                Object.keys(localStorage).forEach((key) => {
+                    if (key.startsWith('iron_macros_') && !key.endsWith(userData.email?.toLowerCase())) {
+                        localStorage.removeItem(key);
+                    }
+                });
                 localStorage.setItem('iron_auth_user', JSON.stringify(userData));
             }
         } catch {}
@@ -81,7 +87,12 @@ export function AuthProvider({ children }) {
         } finally {
             setUser(null);
             try {
-                localStorage.removeItem('iron_auth_user');
+                // Purge all Iron Pulse session caches on logout
+                Object.keys(localStorage).forEach((key) => {
+                    if (key.startsWith('iron_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
             } catch {}
         }
     };

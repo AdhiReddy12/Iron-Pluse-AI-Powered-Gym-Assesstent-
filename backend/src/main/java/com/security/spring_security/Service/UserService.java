@@ -33,6 +33,20 @@ public class UserService {
             user.setEmail(user.getEmail().trim().toLowerCase());
         }
 
+        if (!user.isTermsAccepted()) {
+            throw new RuntimeException(
+                    "You must accept the Terms of Service and Privacy Policy to create an account."
+            );
+        }
+
+        if (user.getTermsAcceptedAt() == null) {
+            user.setTermsAcceptedAt(LocalDateTime.now());
+        }
+
+        if (user.getTermsVersion() == null || user.getTermsVersion().isBlank()) {
+            user.setTermsVersion("2026-10-14");
+        }
+
         try {
             if (repo.findByEmailIgnoreCase(user.getEmail()) != null) {
                 throw new RuntimeException(

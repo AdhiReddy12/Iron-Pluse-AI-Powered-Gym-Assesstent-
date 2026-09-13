@@ -88,7 +88,8 @@ export function MacroProvider({ children }) {
   const { user, token, setUser, loading: authLoading } = useAuth();
 
   const [userMacros, setUserMacros] = useState(() => {
-    return getMacrosFromUser(user) || getMacrosFromStorage(user?.email);
+    if (user?.hasConfiguredMacros === false) return null;
+    return getMacrosFromUser(user) || (user?.hasConfiguredMacros ? getMacrosFromStorage(user?.email) : null);
   });
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -99,6 +100,18 @@ export function MacroProvider({ children }) {
       return;
     }
 
+    // 1. If user explicitly has NOT configured macros, PURGE any stale local cache!
+    if (user.hasConfiguredMacros === false || (!user.hasConfiguredMacros && !user.targetCalories)) {
+      setUserMacros(null);
+      if (user.email) {
+        try {
+          localStorage.removeItem(`iron_macros_${user.email.toLowerCase()}`);
+        } catch {}
+      }
+      return;
+    }
+
+    // 2. If user has macros on profile
     const fromUser = getMacrosFromUser(user);
     if (fromUser) {
       setUserMacros(fromUser);
@@ -110,19 +123,11 @@ export function MacroProvider({ children }) {
       return;
     }
 
+    // 3. Fallback to localStorage only if user has configured macros
     const fromStorage = getMacrosFromStorage(user.email);
     if (fromStorage && fromStorage.calories) {
       setUserMacros(fromStorage);
       return;
-    }
-
-    if (user.hasConfiguredMacros === false) {
-      setUserMacros(null);
-      if (user.email) {
-        try {
-          localStorage.removeItem(`iron_macros_${user.email.toLowerCase()}`);
-        } catch {}
-      }
     }
   }, [user]);
 
@@ -180,10 +185,16 @@ export function MacroProvider({ children }) {
   const closeMacroCalculator = () => setModalOpen(false);
 
   // Synchronously determine if macros are set to avoid any render flash
-  const effectiveMacros = userMacros || getMacrosFromUser(user) || getMacrosFromStorage(user?.email);
+  // If user explicitly has NOT configured macros, ignore and discard any stale storage
+  const isExplicitlyUnconfigured = Boolean(user && (user.hasConfiguredMacros === false || (!user.hasConfiguredMacros && !user.targetCalories)));
 
+  const effectiveMacros = isExplicitlyUnconfigured
+    ? null
+    : (userMacros || getMacrosFromUser(user) || getMacrosFromStorage(user?.email));
+
+  // A user has configured macros ONLY if they are not explicitly unconfigured AND have valid macros
   const hasConfiguredMacros = Boolean(
-    user && (user.hasConfiguredMacros === true || Boolean(effectiveMacros && effectiveMacros.calories))
+    user && !isExplicitlyUnconfigured && (user.hasConfiguredMacros === true || Boolean(effectiveMacros && effectiveMacros.calories))
   );
 
   const macrosLoading = Boolean(
