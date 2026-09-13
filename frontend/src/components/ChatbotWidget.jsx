@@ -10,7 +10,7 @@ const QUICK_PROMPTS = [
     'How is BMI calculated?',
 ];
 
-const API_URL = 'https://hugging-face-fine-tuned-inference.vercel.app/chat';
+const API_URL = import.meta.env.VITE_CHATBOT_API_URL || '/chat';
 const API_TIMEOUT = 60000; // 1 minute timeout
 
 async function getBotResponse(userText, conversationHistory) {
