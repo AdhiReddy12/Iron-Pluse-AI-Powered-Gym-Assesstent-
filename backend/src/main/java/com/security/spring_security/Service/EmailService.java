@@ -1,5 +1,6 @@
 package com.security.spring_security.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 @Service
@@ -15,29 +18,44 @@ public class EmailService {
     private static final Logger log =
             LoggerFactory.getLogger(EmailService.class);
 
-    private final RestClient restClient;
+    private final RestClient gmailClient;
+    private final RestClient oauthClient;
+    private final ObjectMapper objectMapper;
 
-    @Value("${RESEND_API_KEY:}")
-    private String resendApiKey;
+    @Value("${GMAIL_CLIENT_ID:}")
+    private String clientId;
+
+    @Value("${GMAIL_CLIENT_SECRET:}")
+    private String clientSecret;
+
+    @Value("${GMAIL_REFRESH_TOKEN:}")
+    private String refreshToken;
+
+    @Value("${GMAIL_SENDER:}")
+    private String senderEmail;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    public EmailService() {
-        this.restClient = RestClient.builder()
-                .baseUrl("https://api.resend.com")
+    public EmailService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+
+        this.gmailClient = RestClient.builder()
+                .baseUrl("https://gmail.googleapis.com/gmail/v1")
+                .build();
+
+        this.oauthClient = RestClient.builder()
+                .baseUrl("https://oauth2.googleapis.com")
                 .build();
     }
 
     public void sendResetLink(String toEmail, String resetLink) {
-        log.info("RESEND DEBUG: sendResetLink() was called");
-
-        String html = buildEmailBody(resetLink);
+        log.info("GMAIL API: sendResetLink() called");
 
         sendEmail(
                 toEmail,
                 "Iron Pulse — Reset Your Password",
-                html
+                buildEmailBody(resetLink)
         );
     }
 
@@ -45,7 +63,7 @@ public class EmailService {
             String toEmail,
             String verificationToken) {
 
-        log.info("RESEND DEBUG: sendVerificationEmail() was called");
+        log.info("GMAIL API: sendVerificationEmail() called");
 
         String verificationLink = frontendUrl
                 + "/verify-email?token="
@@ -63,41 +81,114 @@ public class EmailService {
             String subject,
             String html) {
 
-        if (resendApiKey == null || resendApiKey.isBlank()) {
-            log.error("RESEND ERROR: RESEND_API_KEY is missing");
-            throw new RuntimeException("Email service is not configured.");
+        if (clientId.isBlank()
+                || clientSecret.isBlank()
+                || refreshToken.isBlank()
+                || senderEmail.isBlank()) {
+
+            throw new IllegalStateException(
+                    "Gmail API environment variables are missing."
+            );
         }
 
         try {
-            log.info("RESEND DEBUG: Sending email through Resend API");
+            String accessToken = getAccessToken();
 
-            Map<String, Object> request = Map.of(
-                    "from", "Iron Pulse <onboarding@resend.dev>",
-                    "to", new String[]{toEmail},
-                    "subject", subject,
-                    "html", html
+            String rawMessage = buildRawMessage(
+                    toEmail, subject, html
             );
 
-            String response = restClient.post()
-                    .uri("/emails")
-                    .header("Authorization", "Bearer " + resendApiKey)
+            String encodedMessage = Base64.getUrlEncoder()
+                    .withoutPadding()
+                    .encodeToString(
+                            rawMessage.getBytes(StandardCharsets.UTF_8)
+                    );
+
+            Map<String, Object> request = Map.of(
+                    "raw", encodedMessage
+            );
+
+            String response = gmailClient.post()
+                    .uri("/users/me/messages/send")
+                    .headers(headers ->
+                            headers.setBearerAuth(accessToken))
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
                     .body(String.class);
 
-            log.info("RESEND SUCCESS: API accepted email request. Response: {}",
-                    response);
+            log.info("GMAIL API: Email accepted for recipient {}",
+                    toEmail);
 
         } catch (Exception e) {
-            log.error("RESEND ERROR: Email request failed: {}",
+            log.error("GMAIL API: Failed to send email: {}",
                     e.getMessage(), e);
 
             throw new RuntimeException(
-                    "Unable to send email through Resend.",
-                    e
+                    "Unable to send email through Gmail API.", e
             );
         }
+    }
+
+    private String getAccessToken() {
+        Map<String, String> request = Map.of(
+                "client_id", clientId,
+                "client_secret", clientSecret,
+                "refresh_token", refreshToken,
+                "grant_type", "refresh_token"
+        );
+
+        Map<?, ?> response = oauthClient.post()
+                .uri("/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(
+                        org.springframework.util.LinkedMultiValueMap
+                                .<String, String>fromMultiValue(
+                                        Map.of(
+                                                "client_id",
+                                                java.util.List.of(clientId),
+                                                "client_secret",
+                                                java.util.List.of(clientSecret),
+                                                "refresh_token",
+                                                java.util.List.of(refreshToken),
+                                                "grant_type",
+                                                java.util.List.of("refresh_token")
+                                        )
+                                )
+                )
+                .retrieve()
+                .body(Map.class);
+
+        if (response == null || response.get("access_token") == null) {
+            throw new RuntimeException(
+                    "Google OAuth did not return an access token."
+            );
+        }
+
+        return response.get("access_token").toString();
+    }
+
+    private String buildRawMessage(
+            String toEmail,
+            String subject,
+            String html) throws Exception {
+
+        String encodedSubject = "=?UTF-8?B?"
+                + Base64.getEncoder().encodeToString(
+                        subject.getBytes(StandardCharsets.UTF_8))
+                + "?=";
+
+        String message = "From: Iron Pulse <" + senderEmail + ">\r\n"
+                + "To: " + toEmail + "\r\n"
+                + "Subject: " + encodedSubject + "\r\n"
+                + "MIME-Version: 1.0\r\n"
+                + "Content-Type: text/html; charset=UTF-8\r\n"
+                + "Content-Transfer-Encoding: base64\r\n"
+                + "\r\n"
+                + Base64.getEncoder().encodeToString(
+                        html.getBytes(StandardCharsets.UTF_8));
+
+        return message;
     }
 
     private String buildVerificationEmailBody(String verificationLink) {
