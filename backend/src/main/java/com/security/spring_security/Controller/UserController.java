@@ -2,10 +2,11 @@ package com.security.spring_security.Controller;
 
 import com.security.spring_security.Model.User;
 import com.security.spring_security.Model.UserCacheDTO;
-import com.security.spring_security.Service.UserService;
-import com.security.spring_security.Config.JwtUtil;
 import com.security.spring_security.Model.UpdateProfileRequest;
 import com.security.spring_security.Model.UpdateMacrosRequest;
+import com.security.spring_security.Service.UserService;
+import com.security.spring_security.Service.PasswordResetService;
+import com.security.spring_security.Config.JwtUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -505,6 +509,88 @@ public class UserController {
                     "Unable to change password. Check your current password and the new password requirements.");
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(response);
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, Object>> forgotPassword(
+            @RequestBody Map<String, String> body) {
+
+        Map<String, Object> response = new HashMap<>();
+        String email = body.get("email");
+
+        if (email == null || email.isBlank()) {
+            response.put("success", false);
+            response.put("message", "Email is required.");
+
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            passwordResetService.processForgotPassword(email);
+
+            response.put("success", true);
+            response.put("message",
+                    "If the account exists, a password reset email will be sent.");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            response.put("success", false);
+            response.put("message",
+                    "Unable to process password reset right now.");
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(response);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, Object>> resetPassword(
+            @RequestBody Map<String, String> body) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        String token = body.get("token");
+        String newPassword = body.get("newPassword");
+
+        if (token == null || token.isBlank()
+                || newPassword == null || newPassword.isBlank()) {
+
+            response.put("success", false);
+            response.put("message", "Token and new password are required.");
+
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            String error = passwordResetService.resetPassword(
+                    token, newPassword);
+
+            if (error != null) {
+                response.put("success", false);
+                response.put("message", error);
+
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            response.put("success", true);
+            response.put("message",
+                    "Password reset successfully. Please log in again.");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            response.put("success", false);
+            response.put("message",
+                    "Unable to reset password right now.");
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(response);
         }
     }
