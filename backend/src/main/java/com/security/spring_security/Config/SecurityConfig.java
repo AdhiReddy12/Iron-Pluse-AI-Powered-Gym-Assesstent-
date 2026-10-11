@@ -56,50 +56,109 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .filter(origin -> !origin.isEmpty())
-                .toList());
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        config.setAllowedOrigins(
+                Arrays.stream(allowedOrigins.split(","))
+                        .map(String::trim)
+                        .filter(origin -> !origin.isEmpty())
+                        .toList()
+        );
+
+        config.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        );
+
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+
         http
                 .cors(Customizer.withDefaults())
                 .csrf(customizer -> customizer.disable())
                 .headers(headers -> headers
-                    .frameOptions(frameOptions -> frameOptions.deny())
-                    .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
-                    .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
+                        .frameOptions(frameOptions -> frameOptions.deny())
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000))
+                        .contentSecurityPolicy(csp ->
+                                csp.policyDirectives("default-src 'self'"))
                 )
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/register", "/login", "/api/register", "/api/login", "/api/logout", "/api/verify-email", "/api/resend-verification", "/forgot-password/**",
-                                "/api/forgot-password/**", "/api/auth/**", "/csrf-token", "/error", "/api/warmup")
+                        .requestMatchers(
+                                "/register",
+                                "/login",
+                                "/api/register",
+                                "/api/login",
+                                "/api/logout",
+                                "/api/verify-email",
+                                "/api/resend-verification",
+                                "/api/forgot-password",
+                                "/api/forgot-password/**",
+                                "/api/reset-password",
+                                "/api/auth/**",
+                                "/csrf-token",
+                                "/error",
+                                "/api/warmup"
+                        )
                         .permitAll()
-                        .requestMatchers("/api/calorie-predictions/predict", "/api/calorie-predictions/health",
-                                "/api/calorie-predictions/exercises", "/api/foods/**", "/api/food-plan/**")
+
+                        .requestMatchers(
+                                "/api/calorie-predictions/predict",
+                                "/api/calorie-predictions/health",
+                                "/api/calorie-predictions/exercises",
+                                "/api/foods/**",
+                                "/api/food-plan/**"
+                        )
                         .permitAll()
-                        .requestMatchers("/api/recovery/**").permitAll()
-                        .requestMatchers("/**.html", "/**.css", "/**.js").permitAll()
-                        .anyRequest().authenticated())
+
+                        .requestMatchers("/api/recovery/**")
+                        .permitAll()
+
+                        .requestMatchers(
+                                "/**.html",
+                                "/**.css",
+                                "/**.js"
+                        )
+                        .permitAll()
+
+                        .anyRequest()
+                        .authenticated()
+                )
                 .authenticationProvider(authProvider())
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .addFilterBefore(
+                        rateLimitFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                );
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+
         return config.getAuthenticationManager();
     }
 }
