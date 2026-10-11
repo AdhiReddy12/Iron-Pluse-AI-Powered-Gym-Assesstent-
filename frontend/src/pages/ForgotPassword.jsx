@@ -77,7 +77,7 @@ export default function ForgotPassword() {
         setLoading(true);
         setLiveAnnouncement('Sending password reset email...');
         try {
-           const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+           const res = await fetch(`${API_BASE}/forgot-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: email.trim().toLowerCase() }),
