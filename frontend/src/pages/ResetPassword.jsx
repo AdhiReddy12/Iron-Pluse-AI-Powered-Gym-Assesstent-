@@ -124,7 +124,7 @@ export default function ResetPassword() {
         setLoading(true);
         setLiveAnnouncement('Submitting password reset...');
         try {
-            const res = await fetch(`${API_BASE}/auth/reset-password`, {
+            const res = await fetch(`${API_BASE}/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token, newPassword }),
