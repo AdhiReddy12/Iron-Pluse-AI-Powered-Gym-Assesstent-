@@ -1,11 +1,11 @@
 package com.security.spring_security.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 
 import java.nio.charset.StandardCharsets;
@@ -20,7 +20,6 @@ public class EmailService {
 
     private final RestClient gmailClient;
     private final RestClient oauthClient;
-    private final ObjectMapper objectMapper;
 
     @Value("${GMAIL_CLIENT_ID:}")
     private String clientId;
@@ -37,9 +36,7 @@ public class EmailService {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    public EmailService(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-
+    public EmailService() {
         this.gmailClient = RestClient.builder()
                 .baseUrl("https://gmail.googleapis.com/gmail/v1")
                 .build();
@@ -50,8 +47,6 @@ public class EmailService {
     }
 
     public void sendResetLink(String toEmail, String resetLink) {
-        log.info("GMAIL API: sendResetLink() called");
-
         sendEmail(
                 toEmail,
                 "Iron Pulse — Reset Your Password",
@@ -62,8 +57,6 @@ public class EmailService {
     public void sendVerificationEmail(
             String toEmail,
             String verificationToken) {
-
-        log.info("GMAIL API: sendVerificationEmail() called");
 
         String verificationLink = frontendUrl
                 + "/verify-email?token="
@@ -108,7 +101,7 @@ public class EmailService {
                     "raw", encodedMessage
             );
 
-            String response = gmailClient.post()
+            gmailClient.post()
                     .uri("/users/me/messages/send")
                     .headers(headers ->
                             headers.setBearerAuth(accessToken))
@@ -131,31 +124,18 @@ public class EmailService {
     }
 
     private String getAccessToken() {
-        Map<String, String> request = Map.of(
-                "client_id", clientId,
-                "client_secret", clientSecret,
-                "refresh_token", refreshToken,
-                "grant_type", "refresh_token"
-        );
+        LinkedMultiValueMap<String, String> form =
+                new LinkedMultiValueMap<>();
+
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        form.add("refresh_token", refreshToken);
+        form.add("grant_type", "refresh_token");
 
         Map<?, ?> response = oauthClient.post()
                 .uri("/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(
-                        org.springframework.util.LinkedMultiValueMap
-                                .<String, String>fromMultiValue(
-                                        Map.of(
-                                                "client_id",
-                                                java.util.List.of(clientId),
-                                                "client_secret",
-                                                java.util.List.of(clientSecret),
-                                                "refresh_token",
-                                                java.util.List.of(refreshToken),
-                                                "grant_type",
-                                                java.util.List.of("refresh_token")
-                                        )
-                                )
-                )
+                .body(form)
                 .retrieve()
                 .body(Map.class);
 
@@ -171,14 +151,14 @@ public class EmailService {
     private String buildRawMessage(
             String toEmail,
             String subject,
-            String html) throws Exception {
+            String html) {
 
         String encodedSubject = "=?UTF-8?B?"
                 + Base64.getEncoder().encodeToString(
                         subject.getBytes(StandardCharsets.UTF_8))
                 + "?=";
 
-        String message = "From: Iron Pulse <" + senderEmail + ">\r\n"
+        return "From: Iron Pulse <" + senderEmail + ">\r\n"
                 + "To: " + toEmail + "\r\n"
                 + "Subject: " + encodedSubject + "\r\n"
                 + "MIME-Version: 1.0\r\n"
@@ -187,8 +167,6 @@ public class EmailService {
                 + "\r\n"
                 + Base64.getEncoder().encodeToString(
                         html.getBytes(StandardCharsets.UTF_8));
-
-        return message;
     }
 
     private String buildVerificationEmailBody(String verificationLink) {
