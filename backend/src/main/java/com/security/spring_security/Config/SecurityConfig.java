@@ -97,6 +97,7 @@ public class SecurityConfig {
                                 csp.policyDirectives("default-src 'self'"))
                 )
                 .authorizeHttpRequests(request -> request
+
                         .requestMatchers(
                                 "/register",
                                 "/login",
@@ -105,6 +106,7 @@ public class SecurityConfig {
                                 "/api/logout",
                                 "/api/verify-email",
                                 "/api/resend-verification",
+                                "/forgot-password/**",
                                 "/api/forgot-password",
                                 "/api/forgot-password/**",
                                 "/api/reset-password",
