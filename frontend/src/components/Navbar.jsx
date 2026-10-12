@@ -168,11 +168,15 @@ export default function Navbar({ onOpenShortcuts }) {
             flexShrink: 0,
           }}
         >
-          <Flame
-            size={22}
+          <img
+            src="/favicon.svg"
+            alt="Iron Pulse"
             style={{
-              color: '#00f0ff',
-              filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.4))',
+              width: '26px',
+              height: '26px',
+              borderRadius: '6px',
+              display: 'block',
+              filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.35))',
             }}
           />
           <span className="brand-text">Iron Pulse</span>

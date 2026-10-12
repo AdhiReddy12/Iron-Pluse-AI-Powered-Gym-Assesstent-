@@ -333,9 +333,17 @@
     margin-top: 1px;
 }
 
-.ai-insight-icon.success { color: #34d399; }
-.ai-insight-icon.warning { color: #fbbf24; }
-.ai-insight-icon.info { color: #22d3ee; }
+.ai-insight-icon.success {
+    color: #34d399;
+}
+
+.ai-insight-icon.warning {
+    color: #fbbf24;
+}
+
+.ai-insight-icon.info {
+    color: #22d3ee;
+}
 
 .ai-insight-text {
     font-size: 0.8125rem;
@@ -445,10 +453,21 @@
     transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.progress-bar-value.cyan { background: linear-gradient(90deg, #0891b2, #22d3ee); }
-.progress-bar-value.amber { background: linear-gradient(90deg, #d97706, #fbbf24); }
-.progress-bar-value.green { background: linear-gradient(90deg, #059669, #34d399); }
-.progress-bar-value.red { background: linear-gradient(90deg, #dc2626, #f87171); }
+.progress-bar-value.cyan {
+    background: linear-gradient(90deg, #0891b2, #22d3ee);
+}
+
+.progress-bar-value.amber {
+    background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.progress-bar-value.green {
+    background: linear-gradient(90deg, #059669, #34d399);
+}
+
+.progress-bar-value.red {
+    background: linear-gradient(90deg, #dc2626, #f87171);
+}
 
 /* ── Fitness Streak ──────────────────────────────────────────── */
 .streak-content {
@@ -462,10 +481,14 @@
     padding: 1rem 0;
 }
 
-.streak-emoji {
-    font-size: 2.25rem;
+.streak-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
     margin-bottom: 0.25rem;
+    color: #f97316;
+    filter: drop-shadow(0 2px 8px rgba(249, 115, 22, 0.35));
 }
 
 .streak-number {
@@ -737,12 +760,20 @@
 }
 
 @keyframes dashPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
 }
 
 /* ── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+
     .kpi-card,
     .dash-card,
     .activity-item,
@@ -751,6 +782,7 @@
     .kpi-mini-progress-fill {
         transition: none !important;
     }
+
     .dash-skeleton {
         animation: none !important;
     }
