@@ -315,7 +315,7 @@ select option:disabled {
 }
 
 .glow-card:hover {
-  border-color: var(--border-focus);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ================================================================
