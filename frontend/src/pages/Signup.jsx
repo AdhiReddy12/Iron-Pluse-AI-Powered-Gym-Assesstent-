@@ -81,6 +81,7 @@ export default function Signup() {
 
   const update = (field) => (e) => {
     setForm({ ...form, [field]: e.target.value });
+    setSubmitted(false);
     if (field === 'email') {
       setEmailValidation(getEmailValidationStatus(e.target.value));
     }
@@ -118,10 +119,22 @@ export default function Signup() {
     passedCount <= 4 ? 'Good' :
     'Strong';
 
-  const invalidAge = form.age !== '' && (Number(form.age) < 10 || Number(form.age) > 120);
+  const invalidAge = form.age !== '' && (Number(form.age) < 10 || Number(form.age) > 99);
 
   const [submitted, setSubmitted] = useState(false);
   const [hadError, setHadError] = useState({});
+    const [touched, setTouched] = useState({});
+    const [focused, setFocused] = useState({});
+
+    const handleBlur = (field) => () => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setFocused((prev) => ({ ...prev, [field]: false }));
+    };
+
+    const handleFocus = (field) => () => {
+        setFocused((prev) => ({ ...prev, [field]: true }));
+    };
+
 
   const getFieldState = (field) => {
     let isInvalid = false;
@@ -144,6 +157,14 @@ export default function Signup() {
       isInvalid = (submitted || form.confirmPassword.length > 0) && !isValid;
     }
 
+        if (focused && focused[field] && !submitted) {
+        isInvalid = false;
+        isValid = false;
+    } else if (!submitted && touched && !touched[field]) {
+        isInvalid = false;
+        isValid = false;
+    }
+
     if (isInvalid) return 'invalid';
     if (isValid && hadError[field]) return 'valid'; // Only green if previously red/error
     return 'neutral';
@@ -164,7 +185,7 @@ export default function Signup() {
     const invalidFields = [];
     if (!form.username.trim()) invalidFields.push({ name: 'username', ref: fieldRefs.username, msg: 'Username is required' });
     if (emailValidation.status !== 'valid') invalidFields.push({ name: 'email', ref: fieldRefs.email, msg: emailValidation.message || 'Valid email is required' });
-    if (!form.age || invalidAge) invalidFields.push({ name: 'age', ref: fieldRefs.age, msg: invalidAge ? 'Age must be between 10 and 120' : 'Age is required' });
+    if (!form.age || invalidAge) invalidFields.push({ name: 'age', ref: fieldRefs.age, msg: invalidAge ? 'Age must be between 10 and 99' : 'Age is required' });
     if (!Object.values(checks).every(Boolean)) invalidFields.push({ name: 'password', ref: fieldRefs.password, msg: 'Password complexity rules not met' });
     if (!passwordsMatch) invalidFields.push({ name: 'confirmPassword', ref: fieldRefs.confirmPassword, msg: 'Passwords do not match' });
 
@@ -379,7 +400,7 @@ export default function Signup() {
               value={form.age}
               onChange={(e) => {
                 const val = e.target.value;
-                if (val === '' || /^\d{0,3}$/.test(val)) {
+                if (val === '' || /^\d{0,2}$/.test(val)) {
                   setForm({ ...form, age: val });
                 }
               }}
@@ -394,7 +415,7 @@ export default function Signup() {
               required
             />
           </div>
-          {invalidAge && <div className="field-error"><AlertCircle size={14} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} /> Age must be between 10 and 120 years</div>}
+          {invalidAge && <div className="field-error"><AlertCircle size={14} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} /> Age must be between 10 and 99 years</div>}
         </div>
 
         {/* Password */}

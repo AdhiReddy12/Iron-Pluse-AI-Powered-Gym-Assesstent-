@@ -501,7 +501,7 @@ export default function Workout() {
 
             const val = wizardData[step.key];
             const num = Number(val);
-            const isOutOfRange = val !== '' && (num < minVal || num > maxVal);
+            const isOutOfRange = wizardAttemptedNext && val !== '' && (num < minVal || num > maxVal);
             const isEmptyError = wizardAttemptedNext && val === '';
             const isInvalid = isOutOfRange || isEmptyError;
 
@@ -510,16 +510,16 @@ export default function Workout() {
                     <div className={`input-field wizard-number-input ${isInvalid ? 'invalid' : ''}`}>
                         <span className="icon">{step.icon}</span>
                         <input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder={placeholder}
-                            value={val}
-                            onChange={(e) => {
-                                const maxLen = step.key === 'age' ? 2 : 3;
-                                const v = e.target.value;
-                                const rx = new RegExp(`^\\d{0,${maxLen}}$`);
-                                if (v === '' || rx.test(v)) {
-                                    setWizardData({ ...wizardData, [step.key]: v });
+                                type="text"
+                                inputMode={step.key === 'age' ? 'numeric' : 'decimal'}
+                                placeholder={placeholder}
+                                value={val}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    const rx = step.key === 'age' ? /^\d{0,2}$/ : /^\d{0,3}(\.\d{0,1})?$/;
+                                    if (v === '' || rx.test(v)) {
+                                        setWizardData({ ...wizardData, [step.key]: v });
+                                    setWizardAttemptedNext(false);
                                 }
                             }}
                             autoFocus

@@ -547,7 +547,7 @@ export default function ResetPassword() {
                             type={showConfirmPassword ? 'text' : 'password'}
                             placeholder="••••••••"
                             value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            onChange={(e) => { setConfirmPassword(e.target.value); setSubmitted(false); }}
                             onFocus={() => setFocusedField('confirmPassword')}
                             onBlur={() => setFocusedField(null)}
                             style={{

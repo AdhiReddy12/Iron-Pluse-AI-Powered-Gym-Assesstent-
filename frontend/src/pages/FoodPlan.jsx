@@ -240,7 +240,7 @@ export default function FoodPlan() {
     const canGoNext = () => {
         const val = wizardData[currentStep.key];
         if (['gender', 'goal', 'mealType', 'dietType'].includes(currentStep.key)) return val !== '' && val !== null && val !== undefined;
-        if (currentStep.key === 'age') return val !== '' && val !== null && Number(val) >= 10 && Number(val) <= 120;
+        if (currentStep.key === 'age') return val !== '' && val !== null && Number(val) >= 10 && Number(val) <= 99;
         if (currentStep.key === 'height') return val !== '' && val !== null && Number(val) >= 50 && Number(val) <= 250;
         if (currentStep.key === 'weight') return val !== '' && val !== null && Number(val) >= 20 && Number(val) <= 300;
         return val !== '' && val !== null && val !== undefined;
@@ -357,12 +357,12 @@ export default function FoodPlan() {
             const units = step.key === 'weight' ? 'kg' : step.key === 'height' ? 'cm' : 'years';
             const placeholder = step.key === 'age' ? '25' : step.key === 'weight' ? '70' : '175';
             const minVal = step.key === 'age' ? 10 : step.key === 'height' ? 50 : 20;
-            const maxVal = step.key === 'age' ? 120 : step.key === 'height' ? 250 : 300;
+            const maxVal = step.key === 'age' ? 99 : step.key === 'height' ? 250 : 300;
             const valName = step.key === 'age' ? 'Age' : step.key === 'height' ? 'Height' : 'Weight';
 
             const val = wizardData[step.key];
             const num = Number(val);
-            const isOutOfRange = val !== '' && (num < minVal || num > maxVal);
+            const isOutOfRange = wizardAttemptedNext && val !== '' && (num < minVal || num > maxVal);
             const isEmptyError = wizardAttemptedNext && val === '';
             const isInvalid = isOutOfRange || isEmptyError;
 
@@ -371,16 +371,16 @@ export default function FoodPlan() {
                     <div className={`input-field fw-number-input ${isInvalid ? 'invalid' : ''}`}>
                         <span className="icon">{step.icon}</span>
                         <input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder={placeholder}
-                            value={val}
-                            onChange={(e) => {
-                                const maxLen = step.key === 'age' ? 2 : 3;
-                                const v = e.target.value;
-                                const rx = new RegExp(`^\\d{0,${maxLen}}$`);
-                                if (v === '' || rx.test(v)) {
-                                    setWizardData({ ...wizardData, [step.key]: v });
+                                type="text"
+                                inputMode={step.key === 'age' ? 'numeric' : 'decimal'}
+                                placeholder={placeholder}
+                                value={val}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    const rx = step.key === 'age' ? /^\d{0,2}$/ : /^\d{0,3}(\.\d{0,1})?$/;
+                                    if (v === '' || rx.test(v)) {
+                                        setWizardData({ ...wizardData, [step.key]: v });
+                                    setWizardAttemptedNext(false);
                                 }
                             }}
                             autoFocus
