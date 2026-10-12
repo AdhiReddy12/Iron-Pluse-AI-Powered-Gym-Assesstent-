@@ -4,10 +4,7 @@ import { signupUser } from '../api/auth';
 import { getEmailValidationStatus } from '../utils/emailValidation';
 import Silk from '../components/Silk';
 import AccessibleButton from '../components/AccessibleButton';
-import {
-  Flame, User, Mail, Lock, Cake,
-  Check, X, AlertCircle, Eye, EyeOff
-} from 'lucide-react';
+import { Fire as Flame, User as User, Envelope as Mail, Lock as Lock, Cake as Cake, Check as Check, X as X, WarningCircle as AlertCircle, Eye as Eye, EyeClosed as EyeOff } from '@phosphor-icons/react';
 
 /* ── Inline Google SVG logo ───────────────────────────────── */
 function GoogleLogo() {
@@ -378,12 +375,13 @@ export default function Signup() {
             <Cake size={18} style={iconStyle('age')} />
             <input
               ref={fieldRefs.age}
-              id="signup-age" type="number" placeholder="25" min="10" max="99"
+              id="signup-age" type="text" inputMode="numeric" placeholder="25"
               value={form.age}
-              onChange={(e) => setForm({ ...form, age: e.target.value.slice(0, 2) })}
-              onKeyDown={(e) => {
-                if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
-                if (e.target.value.length >= 2 && /^[0-9]$/.test(e.key)) e.preventDefault();
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '' || /^\d{0,3}$/.test(val)) {
+                  setForm({ ...form, age: val });
+                }
               }}
               onFocus={() => setFocusedField('age')}
               onBlur={() => setFocusedField(null)}

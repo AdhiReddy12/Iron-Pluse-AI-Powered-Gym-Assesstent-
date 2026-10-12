@@ -8,11 +8,7 @@ import {
     BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
     ResponsiveContainer,
 } from 'recharts';
-import {
-    Flame, Activity, Utensils, Dumbbell, Sparkles,
-    TrendingUp, TrendingDown, Target, ChevronRight, Award,
-    BrainCircuit, Scale, Heart
-} from 'lucide-react';
+import { Fire as Flame, Pulse as Activity, ForkKnife as Utensils, Barbell as Dumbbell, Sparkle as Sparkles, TrendUp as TrendingUp, TrendDown as TrendingDown, Target as Target, CaretRight as ChevronRight, Trophy as Award, Brain as BrainCircuit, Scales as Scale, Heart as Heart } from '@phosphor-icons/react';
 import './Dashboard.css';
 
 /* ── Utilities ─────────────────────────────────────────────── */

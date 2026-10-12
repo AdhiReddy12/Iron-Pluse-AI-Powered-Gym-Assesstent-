@@ -4,7 +4,7 @@ import { fetchWorkouts, changePassword } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import AccessibleButton from '../components/AccessibleButton';
 import './Profile.css';
-import { LogOut, Lock, Check, AlertCircle, Edit, Dumbbell, Eye, EyeOff } from 'lucide-react';
+import { SignOut as LogOut, Lock as Lock, Check as Check, WarningCircle as AlertCircle, PencilSimple as Edit, Barbell as Dumbbell, Eye as Eye, EyeClosed as EyeOff } from '@phosphor-icons/react';
 
 export default function Profile() {
     const { user, token, logout } = useAuth();

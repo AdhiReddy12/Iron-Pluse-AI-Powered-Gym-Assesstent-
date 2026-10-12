@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import './BMICalculator.css';
 import PageReveal from '../components/PageReveal';
 import AccessibleButton from '../components/AccessibleButton';
-import { Ruler, User, Scale, Cake, BarChart2, Lightbulb, AlertCircle } from 'lucide-react';
+import { Ruler as Ruler, User as User, Scales as Scale, Cake as Cake, ChartBar as BarChart2, Lightbulb as Lightbulb, WarningCircle as AlertCircle } from '@phosphor-icons/react';
 
 const BMI_CATEGORIES = [
     { max: 18.5, label: 'Underweight', color: '#60a5fa', advice: 'Consider a calorie-surplus diet with strength training.' },

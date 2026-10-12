@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './ChatbotWidget.css';
-import { Bot, X, Send, Sparkles, Minimize2, GripHorizontal } from 'lucide-react';
+import { Robot as Bot, X as X, PaperPlaneRight as Send, Sparkle as Sparkles, ArrowsInSimple as Minimize2, DotsSix as GripHorizontal } from '@phosphor-icons/react';
 
 const QUICK_PROMPTS = [
     'Good morning!',

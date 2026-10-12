@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { validateEmail, getEmailValidationStatus } from '../utils/emailValidation';
 import Silk from '../components/Silk';
 import AccessibleButton from '../components/AccessibleButton';
-import { Timer, Mail, Key, Check, X } from 'lucide-react';
+import { Timer as Timer, Envelope as Mail, Key as Key, Check as Check, X as X } from '@phosphor-icons/react';
 
 const API_BASE = 'https://iron-pulse-backend.onrender.com/api';
 
