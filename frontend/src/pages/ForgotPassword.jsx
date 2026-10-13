@@ -5,7 +5,7 @@ import Silk from '../components/Silk';
 import AccessibleButton from '../components/AccessibleButton';
 import { Timer as Timer, Envelope as Mail, Key as Key, Check as Check, X as X } from '@phosphor-icons/react';
 
-const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? '/api' : 'https://iron-pulse-backend.onrender.com/api');
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 /* ── Floating ambient glow circles ────────────────────────── */
 function FloatingGlows() {

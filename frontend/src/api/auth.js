@@ -4,7 +4,7 @@
 // Vite proxy forwards /api/** → http://localhost:8080
 // =============================================
 
-const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? '/api' : 'https://iron-pulse-backend.onrender.com/api');
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 export const SESSION_AUTH = 'cookie';
 
 // Authentication cookies are HttpOnly, so JavaScript never receives the JWT.
