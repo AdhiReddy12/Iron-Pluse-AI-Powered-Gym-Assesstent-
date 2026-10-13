@@ -29,8 +29,12 @@ public class UserService {
     public User register(User user) {
         System.out.println("REGISTER: Registration started");
 
+        if (user.getEmail() != null) {
+            user.setEmail(user.getEmail().trim().toLowerCase());
+        }
+
         try {
-            if (repo.findByEmail(user.getEmail()) != null) {
+            if (repo.findByEmailIgnoreCase(user.getEmail()) != null) {
                 throw new RuntimeException(
                         "An account with this email already exists."
                 );
@@ -91,12 +95,12 @@ public class UserService {
 
     @Cacheable(value = "users", key = "#email.toLowerCase()", sync = true)
     public UserCacheDTO findByEmail(String email) {
-        User user = repo.findByEmail(email);
+        User user = repo.findByEmailIgnoreCase(email);
         return user != null ? new UserCacheDTO(user) : null;
     }
 
     public User findUserEntityByEmail(String email) {
-        return repo.findByEmail(email);
+        return repo.findByEmailIgnoreCase(email);
     }
 
     public User saveUserEntity(User user) {
@@ -129,7 +133,7 @@ public class UserService {
             double height,
             double weight) {
 
-        User user = repo.findByEmail(email);
+        User user = repo.findByEmailIgnoreCase(email);
 
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -169,7 +173,7 @@ public class UserService {
             int fats,
             int carbs) {
 
-        User user = repo.findByEmail(email);
+        User user = repo.findByEmailIgnoreCase(email);
 
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -226,7 +230,7 @@ public class UserService {
             String currentPassword,
             String newPassword) {
 
-        User user = repo.findByEmail(email);
+        User user = repo.findByEmailIgnoreCase(email);
 
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -257,7 +261,7 @@ public class UserService {
     }
 
     public void resendVerificationEmail(String email) {
-        User user = repo.findByEmail(email);
+        User user = repo.findByEmailIgnoreCase(email);
 
         if (user != null && !user.isVerified()) {
             String token = issueVerificationToken(user);

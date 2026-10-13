@@ -57,124 +57,83 @@ export function calculateMacroTargets(data) {
   };
 }
 
-export function MacroProvider({ children }) {
-  const { user, token, setUser } = useAuth();
-  const [userMacros, setUserMacros] = useState(() => {
-    if (user?.hasConfiguredMacros && user?.targetCalories) {
-      return {
-        age: user.age || 25,
-        height: user.height || 175,
-        weight: user.weight || 70,
-        gender: user.gender || 'male',
-        activity: user.activity || 'moderately_active',
-        goal: user.goal || 'maintenance',
-        calories: user.targetCalories,
-        protein: user.targetProtein || 150,
-        fats: user.targetFats || 70,
-        fat: user.targetFats || 70,
-        carbs: user.targetCarbs || 240,
-      };
-    }
+export function getMacrosFromUser(u) {
+  if (!u || !u.hasConfiguredMacros || !u.targetCalories) return null;
+  return {
+    age: u.age || 25,
+    height: u.height || 175,
+    weight: u.weight || 70,
+    gender: u.gender || 'male',
+    activity: u.activity || 'moderately_active',
+    goal: u.goal || 'maintenance',
+    calories: u.targetCalories,
+    protein: u.targetProtein || 150,
+    fats: u.targetFats || 70,
+    fat: u.targetFats || 70,
+    carbs: u.targetCarbs || 240,
+  };
+}
+
+export function getMacrosFromStorage(email) {
+  if (!email) return null;
+  try {
+    const raw = localStorage.getItem(`iron_macros_${email.toLowerCase()}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
     return null;
+  }
+}
+
+export function MacroProvider({ children }) {
+  const { user, token, setUser, loading: authLoading } = useAuth();
+
+  const [userMacros, setUserMacros] = useState(() => {
+    return getMacrosFromUser(user) || getMacrosFromStorage(user?.email);
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [macrosLoading, setMacrosLoading] = useState(() => {
-    if (!user?.email) return false;
-    return user.hasConfiguredMacros === undefined;
-  });
 
-  // Storage key fallback
-  const storageKey = user?.email ? `iron_macros_${user.email.toLowerCase()}` : 'iron_macros_guest';
-
+  // Sync state whenever user changes
   useEffect(() => {
-    let isMounted = true;
-
-    if (user?.email) {
-      // Fast-path: if user object already arrived with configured macros
-      if (user.hasConfiguredMacros && user.targetCalories) {
-        const initialMacros = {
-          age: user.age || 25,
-          height: user.height || 175,
-          weight: user.weight || 70,
-          gender: user.gender || 'male',
-          activity: user.activity || 'moderately_active',
-          goal: user.goal || 'maintenance',
-          calories: user.targetCalories,
-          protein: user.targetProtein || 150,
-          fats: user.targetFats || 70,
-          fat: user.targetFats || 70,
-          carbs: user.targetCarbs || 240,
-        };
-        setUserMacros(initialMacros);
-        localStorage.setItem(storageKey, JSON.stringify(initialMacros));
-        setMacrosLoading(false);
-      } else if (user.hasConfiguredMacros === false) {
-        // Fast-path: user explicitly does not have macros set
-        setUserMacros(null);
-        localStorage.removeItem(storageKey);
-        setMacrosLoading(false);
-      } else {
-        setMacrosLoading(true);
-      }
-
-      // Always verify against database profile
-      fetchUserProfile(token)
-        .then((profile) => {
-          if (!isMounted) return;
-          if (profile && profile.hasConfiguredMacros) {
-            const dbMacros = {
-              age: profile.age || 25,
-              height: profile.height || 175,
-              weight: profile.weight || 70,
-              gender: profile.gender || 'male',
-              activity: profile.activity || 'moderately_active',
-              goal: profile.goal || 'maintenance',
-              calories: profile.targetCalories || 2200,
-              protein: profile.targetProtein || 150,
-              fats: profile.targetFats || 70,
-              fat: profile.targetFats || 70,
-              carbs: profile.targetCarbs || 240,
-            };
-            setUserMacros(dbMacros);
-            localStorage.setItem(storageKey, JSON.stringify(dbMacros));
-            if (setUser) {
-              setUser((prev) => prev ? { ...prev, hasConfiguredMacros: true } : prev);
-            }
-          } else {
-            // User does NOT have macros configured in DB
-            setUserMacros(null);
-            localStorage.removeItem(storageKey);
-            if (setUser) {
-              setUser((prev) => prev ? { ...prev, hasConfiguredMacros: false } : prev);
-            }
-          }
-        })
-        .catch(() => {
-          if (!isMounted) return;
-          if (!user.hasConfiguredMacros) {
-            setUserMacros(null);
-            localStorage.removeItem(storageKey);
-          }
-        })
-        .finally(() => {
-          if (isMounted) {
-            setMacrosLoading(false);
-          }
-        });
-    } else {
+    if (!user) {
       setUserMacros(null);
-      setMacrosLoading(false);
+      return;
     }
 
-    return () => {
-      isMounted = false;
-    };
-  }, [user?.email, token, storageKey, setUser]);
+    const fromUser = getMacrosFromUser(user);
+    if (fromUser) {
+      setUserMacros(fromUser);
+      if (user.email) {
+        try {
+          localStorage.setItem(`iron_macros_${user.email.toLowerCase()}`, JSON.stringify(fromUser));
+        } catch {}
+      }
+      return;
+    }
+
+    const fromStorage = getMacrosFromStorage(user.email);
+    if (fromStorage && fromStorage.calories) {
+      setUserMacros(fromStorage);
+      return;
+    }
+
+    if (user.hasConfiguredMacros === false) {
+      setUserMacros(null);
+      if (user.email) {
+        try {
+          localStorage.removeItem(`iron_macros_${user.email.toLowerCase()}`);
+        } catch {}
+      }
+    }
+  }, [user]);
 
   const saveMacros = async (formData) => {
     const calculated = calculateMacroTargets(formData);
     setUserMacros(calculated);
-    localStorage.setItem(storageKey, JSON.stringify(calculated));
+    if (user?.email) {
+      try {
+        localStorage.setItem(`iron_macros_${user.email.toLowerCase()}`, JSON.stringify(calculated));
+      } catch {}
+    }
     setModalOpen(false);
 
     if (setUser) {
@@ -220,13 +179,25 @@ export function MacroProvider({ children }) {
   const openMacroCalculator = () => setModalOpen(true);
   const closeMacroCalculator = () => setModalOpen(false);
 
-  const hasConfiguredMacros = Boolean(user && userMacros && userMacros.calories);
-  const shouldShowOnboardingWizard = Boolean(user && !hasConfiguredMacros);
+  // Synchronously determine if macros are set to avoid any render flash
+  const effectiveMacros = userMacros || getMacrosFromUser(user) || getMacrosFromStorage(user?.email);
+
+  const hasConfiguredMacros = Boolean(
+    user && (user.hasConfiguredMacros === true || Boolean(effectiveMacros && effectiveMacros.calories))
+  );
+
+  const macrosLoading = Boolean(
+    authLoading || (user && user.hasConfiguredMacros === undefined && !effectiveMacros)
+  );
+
+  const shouldShowOnboardingWizard = Boolean(
+    user && !authLoading && !macrosLoading && !hasConfiguredMacros
+  );
 
   return (
     <MacroContext.Provider
       value={{
-        userMacros,
+        userMacros: effectiveMacros,
         saveMacros,
         modalOpen,
         openMacroCalculator,
