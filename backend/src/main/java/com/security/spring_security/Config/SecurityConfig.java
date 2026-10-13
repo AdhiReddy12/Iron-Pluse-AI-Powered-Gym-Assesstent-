@@ -113,6 +113,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/csrf-token",
                                 "/error",
+                                "/warmup",
                                 "/api/warmup"
                         )
                         .permitAll()
