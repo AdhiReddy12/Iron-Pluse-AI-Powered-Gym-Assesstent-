@@ -53,6 +53,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+        ex.printStackTrace();
         Map<String, Object> response = new HashMap<>();
         response.put("success", false);
         String message = ex.getMessage();
@@ -70,6 +71,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Throwable ex, HttpServletRequest request) {
+        ex.printStackTrace();
         Map<String, Object> response = new HashMap<>();
         response.put("success", false);
         String serviceName = getServiceNameFromRequest(request);

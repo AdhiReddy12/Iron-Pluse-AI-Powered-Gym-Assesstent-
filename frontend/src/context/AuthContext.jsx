@@ -4,8 +4,21 @@ import { fetchUserProfile, logoutUser, SESSION_AUTH } from '../api/auth';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(() => {
+        try {
+            const cached = localStorage.getItem('iron_auth_user');
+            return cached ? JSON.parse(cached) : null;
+        } catch {
+            return null;
+        }
+    });
+    const [loading, setLoading] = useState(() => {
+        try {
+            return !localStorage.getItem('iron_auth_user');
+        } catch {
+            return true;
+        }
+    });
 
     useEffect(() => {
         let active = true;
@@ -16,6 +29,9 @@ export function AuthProvider({ children }) {
 
         const handleAuthExpired = () => {
             setUser(null);
+            try {
+                localStorage.removeItem('iron_auth_user');
+            } catch {}
         };
         window.addEventListener('auth-expired', handleAuthExpired);
 
@@ -24,10 +40,16 @@ export function AuthProvider({ children }) {
                 const profile = await fetchUserProfile();
                 if (active) {
                     setUser(profile);
+                    try {
+                        localStorage.setItem('iron_auth_user', JSON.stringify(profile));
+                    } catch {}
                 }
             } catch {
                 if (active) {
                     setUser(null);
+                    try {
+                        localStorage.removeItem('iron_auth_user');
+                    } catch {}
                 }
             } finally {
                 if (active) {
@@ -46,6 +68,17 @@ export function AuthProvider({ children }) {
 
     const login = (userData) => {
         setUser(userData);
+        try {
+            if (userData) {
+                // Clean any other user's macro cache to prevent cross-account contamination
+                Object.keys(localStorage).forEach((key) => {
+                    if (key.startsWith('iron_macros_') && !key.endsWith(userData.email?.toLowerCase())) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                localStorage.setItem('iron_auth_user', JSON.stringify(userData));
+            }
+        } catch {}
     };
 
     const logout = async () => {
@@ -53,6 +86,14 @@ export function AuthProvider({ children }) {
             await logoutUser();
         } finally {
             setUser(null);
+            try {
+                // Purge all Iron Pulse session caches on logout
+                Object.keys(localStorage).forEach((key) => {
+                    if (key.startsWith('iron_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            } catch {}
         }
     };
 
