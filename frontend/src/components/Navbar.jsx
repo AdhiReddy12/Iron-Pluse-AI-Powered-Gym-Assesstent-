@@ -39,11 +39,20 @@ export default function Navbar({ onOpenShortcuts }) {
 
   /* ── Sliding pill position calculation ───────────────── */
   const updatePill = useCallback(() => {
-    const activeLink = linkRefs.current[location.pathname];
+    let currentPath = location.pathname;
+    if (currentPath === '/calorie_predictor') currentPath = '/calorie-predictor';
+    if (currentPath === '/recovery-predictor') currentPath = '/recovery';
+
+    const activeLink = linkRefs.current[currentPath];
     const container = navContainerRef.current;
     const pill = pillRef.current;
 
-    if (!activeLink || !container || !pill) return;
+    if (!container || !pill) return;
+
+    if (!activeLink) {
+      pill.style.opacity = '0';
+      return;
+    }
 
     const containerRect = container.getBoundingClientRect();
     const linkRect = activeLink.getBoundingClientRect();
@@ -224,7 +233,12 @@ export default function Navbar({ onOpenShortcuts }) {
                 aria-label={label}
                 className="nav-item-link"
                 ref={(el) => { linkRefs.current[to] = el; }}
-                style={({ isActive }) => linkStyle(isActive)}
+                style={({ isActive }) => {
+                  const isActuallyActive = isActive ||
+                    (to === '/calorie-predictor' && location.pathname === '/calorie_predictor') ||
+                    (to === '/recovery' && location.pathname === '/recovery-predictor');
+                  return linkStyle(isActuallyActive);
+                }}
               >
                 <Icon size={18} />
                 <span className="nav-label">{label}</span>
@@ -257,13 +271,21 @@ export default function Navbar({ onOpenShortcuts }) {
           <div ref={dropdownRef} style={{ position: 'relative', flexShrink: 0 }}>
           <button
             onClick={() => setDropdownOpen((v) => !v)}
+            aria-label="User Profile Menu"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
               padding: '6px 12px',
-              background: 'transparent',
-              border: 'none',
+              background: location.pathname === '/profile'
+                ? 'rgba(0, 240, 255, 0.12)'
+                : 'transparent',
+              border: location.pathname === '/profile'
+                ? '1px solid rgba(0, 240, 255, 0.35)'
+                : '1px solid transparent',
+              boxShadow: location.pathname === '/profile'
+                ? '0 0 16px rgba(0, 240, 255, 0.2)'
+                : 'none',
               borderRadius: '9999px',
               color: '#f1f5f9',
               cursor: 'pointer',
@@ -282,9 +304,13 @@ export default function Navbar({ onOpenShortcuts }) {
                 fontSize: '0.8rem',
                 fontWeight: 700,
                 color: '#fff',
+                boxShadow: location.pathname === '/profile'
+                  ? '0 0 0 2px #00f0ff, 0 0 12px rgba(0, 240, 255, 0.5)'
+                  : 'none',
                 animation: dropdownOpen
                   ? 'profileRingPulse 1.5s ease-in-out infinite'
                   : 'none',
+                transition: 'box-shadow 0.25s ease',
               }}
             >
               {user?.username?.charAt(0)?.toUpperCase() || 'U'}
@@ -292,9 +318,9 @@ export default function Navbar({ onOpenShortcuts }) {
             <ChevronDown
               size={14}
               style={{
-                color: '#94a3b8',
+                color: location.pathname === '/profile' ? '#00f0ff' : '#94a3b8',
                 transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0)',
-                transition: 'transform 0.25s ease',
+                transition: 'transform 0.25s ease, color 0.25s ease',
               }}
             />
           </button>
@@ -335,24 +361,30 @@ export default function Navbar({ onOpenShortcuts }) {
               <NavLink
                 to="/profile"
                 onClick={() => setDropdownOpen(false)}
-                style={{
+                style={({ isActive }) => ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
                   padding: '10px 14px',
                   borderRadius: '8px',
-                  color: '#94a3b8',
+                  color: isActive ? '#00f0ff' : '#94a3b8',
+                  background: isActive ? 'rgba(0, 240, 255, 0.1)' : 'transparent',
                   textDecoration: 'none',
                   fontSize: '0.875rem',
+                  fontWeight: isActive ? 600 : 400,
                   transition: 'all 0.15s ease',
-                }}
+                })}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                  e.currentTarget.style.color = '#f1f5f9';
+                  if (location.pathname !== '/profile') {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.color = '#f1f5f9';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#94a3b8';
+                  if (location.pathname !== '/profile') {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#94a3b8';
+                  }
                 }}
               >
                 <User size={16} />

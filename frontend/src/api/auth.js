@@ -28,12 +28,19 @@ function checkAuthError(res) {
 
 // ---- Auth ----
 
-export async function signupUser({ username, email, password, age }) {
+export async function signupUser({ username, email, password, age, termsAccepted, termsVersion }) {
     const normalizedEmail = (email || '').trim().toLowerCase();
     const res = await apiFetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email: normalizedEmail, password, age: parseInt(age) }),
+        body: JSON.stringify({
+            username,
+            email: normalizedEmail,
+            password,
+            age: parseInt(age),
+            termsAccepted: termsAccepted ?? true,
+            termsVersion: termsVersion || '2026-10-14'
+        }),
     });
     let data;
     try {

@@ -70,6 +70,7 @@ export default function Signup() {
 
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const fieldRefs = {
     username: useRef(null),
@@ -77,6 +78,7 @@ export default function Signup() {
     age: useRef(null),
     password: useRef(null),
     confirmPassword: useRef(null),
+    terms: useRef(null),
   };
 
   const update = (field) => (e) => {
@@ -102,7 +104,8 @@ export default function Signup() {
   const allValid =
     Object.values(checks).every(Boolean) &&
     passwordsMatch &&
-    emailValidation.status === 'valid';
+    emailValidation.status === 'valid' &&
+    agreedToTerms;
 
   /* ── Strength bar ────────────────────────────────────── */
   const strengthPercent = (passedCount / 5) * 100;
@@ -188,6 +191,7 @@ export default function Signup() {
     if (!form.age || invalidAge) invalidFields.push({ name: 'age', ref: fieldRefs.age, msg: invalidAge ? 'Age must be between 10 and 99' : 'Age is required' });
     if (!Object.values(checks).every(Boolean)) invalidFields.push({ name: 'password', ref: fieldRefs.password, msg: 'Password complexity rules not met' });
     if (!passwordsMatch) invalidFields.push({ name: 'confirmPassword', ref: fieldRefs.confirmPassword, msg: 'Passwords do not match' });
+    if (!agreedToTerms) invalidFields.push({ name: 'terms', ref: fieldRefs.terms, msg: 'Please agree to the Terms of Service and Privacy Policy' });
 
     if (invalidFields.length > 0) {
       const newHadError = { ...hadError };
@@ -210,6 +214,8 @@ export default function Signup() {
         email: normalizedEmail,
         password: form.password,
         age: form.age,
+        termsAccepted: true,
+        termsVersion: '2026-10-14',
       });
       localStorage.setItem(`iron_newly_registered_${normalizedEmail}`, 'true');
       setRegisteredEmail(normalizedEmail);
@@ -549,13 +555,63 @@ export default function Signup() {
           )}
         </div>
 
+        {/* Explicit Consent Checkbox (GDPR & Biometric Data) */}
+        <div style={{ marginTop: '0.85rem' }}>
+          <label
+            htmlFor="agree-terms"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.625rem',
+              cursor: 'pointer',
+              fontSize: '0.78rem',
+              color: 'var(--text-secondary, #94a3b8)',
+              lineHeight: 1.45,
+              userSelect: 'none',
+            }}
+          >
+            <input
+              ref={fieldRefs.terms}
+              id="agree-terms"
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              style={{
+                marginTop: '0.15rem',
+                width: '16px',
+                height: '16px',
+                accentColor: '#00f0ff',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            />
+            <span>
+              I agree to Iron Pulse's{' '}
+              <Link to="/terms" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-cyan, #00f0ff)', textDecoration: 'underline' }}>
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-cyan, #00f0ff)', textDecoration: 'underline' }}>
+                Privacy Policy
+              </Link>
+              , including the processing of my heart rate and workout telemetry.
+            </span>
+          </label>
+        </div>
+
         {/* Submit */}
         <AccessibleButton
           className="btn-futuristic"
           type="submit"
           disabled={loading || !allValid}
-          disabledReason={!allValid ? "Complete all required fields and satisfy password criteria before creating an account." : "Creating account..."}
-          style={{ width: '100%', marginTop: '0.5rem' }}
+          disabledReason={
+            !allValid
+              ? (!agreedToTerms
+                  ? "You must accept the Terms of Service and Privacy Policy to create an account."
+                  : "Complete all required fields and satisfy password criteria before creating an account.")
+              : "Creating account..."
+          }
+          style={{ width: '100%', marginTop: '1rem' }}
         >
           {loading ? 'Creating…' : 'Create Account'} <span>→</span>
         </AccessibleButton>
